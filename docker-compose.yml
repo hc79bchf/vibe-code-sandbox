@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  sandbox:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vibe-sandbox
+
+    # Required for VSCode/Antigravity attach
+    stdin_open: true
+    tty: true
+
+    # Start as root to fix Docker socket permissions, then drop to vscode
+    user: root
+
+    # Mount the current folder to /workspace in the container
+    volumes:
+      - .:/workspace
+      # Docker socket for controlling host Docker (DooD pattern)
+      - /var/run/docker.sock:/var/run/docker.sock
+
+    # Security: Read-only root filesystem (Optional, ultra-secure mode)
+    # read_only: true 
+
+    # Networking: Allow outbound access (for pip/npm) but you can restrict this later
+    networks:
+      - vibe-net
+
+    # Fix Docker socket permissions for macOS, then keep running
+    command: >
+      bash -c "chown root:docker /var/run/docker.sock &&
+               chmod 660 /var/run/docker.sock &&
+               exec su vscode -c 'sleep infinity'"
+
+    # Environment variables for the AI context
+    environment:
+      - NODE_ENV=development
+      # DO NOT PUT API KEYS HERE. Use a .env file locally that is .gitignored.
+
+networks:
+  vibe-net:
+    driver: bridge
