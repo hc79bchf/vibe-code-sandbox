@@ -1,11 +1,9 @@
-version: '3.8'
-
 services:
   sandbox:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: vibe-sandbox
+    container_name: claude-ui-sandbox
 
     # Required for VSCode/Antigravity attach
     stdin_open: true
@@ -20,12 +18,9 @@ services:
       # Docker socket for controlling host Docker (DooD pattern)
       - /var/run/docker.sock:/var/run/docker.sock
 
-    # Security: Read-only root filesystem (Optional, ultra-secure mode)
-    # read_only: true 
-
     # Networking: Allow outbound access (for pip/npm) but you can restrict this later
     networks:
-      - vibe-net
+      - claude-ui-net
 
     # Fix Docker socket permissions for macOS, then keep running
     command: >
@@ -39,5 +34,5 @@ services:
       # DO NOT PUT API KEYS HERE. Use a .env file locally that is .gitignored.
 
 networks:
-  vibe-net:
+  claude-ui-net:
     driver: bridge
