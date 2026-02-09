@@ -23,11 +23,8 @@ services:
     networks:
       - governance-net
 
-    # Fix Docker socket permissions for macOS, then keep running
-    command: >
-      bash -c "chown root:docker /var/run/docker.sock &&
-               chmod 660 /var/run/docker.sock &&
-               exec su vscode -c 'sleep infinity'"
+    # Entrypoint: fix Docker socket, auto-activate Vibe Guard, sleep
+    command: ["/home/vscode/entrypoint.sh"]
 
     # Environment variables for the AI context
     environment:
