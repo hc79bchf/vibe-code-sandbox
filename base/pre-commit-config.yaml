@@ -1,0 +1,31 @@
+# =============================================================================
+# Vibe Guard — Pre-commit hooks for AI-generated code
+# Runs automatically on every git commit inside the sandbox
+# =============================================================================
+repos:
+  # Layer 1: Auto-fix linters
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.6
+    hooks:
+      - id: ruff
+        args: [ --fix ]
+
+  - repo: https://github.com/biomejs/pre-commit
+    rev: v0.6.1
+    hooks:
+      - id: biome-check
+        additional_dependencies: ["@biomejs/biome@1.9.4"]
+
+  # Layer 2: Security gatekeepers
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.21.2
+    hooks:
+      - id: gitleaks
+
+  # General hygiene
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: no-commit-to-branch
+      - id: check-added-large-files
+      - id: detect-private-key

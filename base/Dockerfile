@@ -52,6 +52,32 @@ RUN npm install -g @socketsecurity/cli
 # ---------------------------------------------------------------------------
 RUN npm install -g @anthropic-ai/claude-code
 
+# ===========================================================================
+# Vibe Guard — 3-Layer Auto-Scan System
+# ===========================================================================
+
+# ---------------------------------------------------------------------------
+# Layer 1: Auto-Fix Linters (Rust-based, millisecond-fast)
+#   - Ruff: Python linter+formatter (replaces Flake8, Black, Isort)
+#   - Biome: JS/TS linter+formatter (replaces ESLint + Prettier)
+# ---------------------------------------------------------------------------
+RUN pip3 install ruff \
+    && npm install -g @biomejs/biome
+
+# ---------------------------------------------------------------------------
+# Layer 2: Security Gatekeepers
+#   - Trivy: scans deps for CVEs + secrets in filesystem mode
+#   - Gitleaks: catches hardcoded API keys in git staging area
+# ---------------------------------------------------------------------------
+RUN curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin \
+    && curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.21.2/gitleaks_8.21.2_linux_arm64.tar.gz \
+       | tar -xz -C /usr/local/bin gitleaks
+
+# ---------------------------------------------------------------------------
+# Layer 3: Pre-commit framework (enforces scans on every commit)
+# ---------------------------------------------------------------------------
+RUN pip3 install pre-commit
+
 # ---------------------------------------------------------------------------
 # VS Code Claude Code extension (pre-installed for devcontainer attach)
 # ---------------------------------------------------------------------------
@@ -72,12 +98,15 @@ RUN claude plugin marketplace add obra/superpowers-marketplace \
 RUN mkdir -p /home/vscode/.claude/projects/-workspace
 
 # ---------------------------------------------------------------------------
-# Plugin update helper script (for refreshing plugins at runtime)
+# Helper scripts and config templates
 # ---------------------------------------------------------------------------
 COPY setup-plugins.sh /home/vscode/setup-plugins.sh
+COPY setup-vibe-guard.sh /home/vscode/setup-vibe-guard.sh
+COPY pre-commit-config.yaml /home/vscode/pre-commit-config.yaml
 
 USER root
-RUN chmod +x /home/vscode/setup-plugins.sh && chown vscode:vscode /home/vscode/setup-plugins.sh
+RUN chmod +x /home/vscode/setup-plugins.sh /home/vscode/setup-vibe-guard.sh \
+    && chown vscode:vscode /home/vscode/setup-plugins.sh /home/vscode/setup-vibe-guard.sh /home/vscode/pre-commit-config.yaml
 USER vscode
 
 # ---------------------------------------------------------------------------
