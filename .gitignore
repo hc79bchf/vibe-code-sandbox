@@ -1,0 +1,2 @@
+# Environment files (contain local paths / secrets)
+.env

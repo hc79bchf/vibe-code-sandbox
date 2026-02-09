@@ -12,9 +12,10 @@ services:
     # Start as root to fix Docker socket permissions, then drop to vscode
     user: root
 
-    # Mount the current folder to /workspace in the container
+    # Mount the project repo to /workspace in the container
+    # Set PROJECT_PATH in .env (see .env.example)
     volumes:
-      - .:/workspace
+      - ${PROJECT_PATH:-.}:/workspace
       # Docker socket for controlling host Docker (DooD pattern)
       - /var/run/docker.sock:/var/run/docker.sock
 
