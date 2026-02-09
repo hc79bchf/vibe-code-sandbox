@@ -60,14 +60,15 @@ RUN code --install-extension anthropic.claude-code 2>/dev/null || true
 
 # ---------------------------------------------------------------------------
 # Claude Code plugins: dev-browser & superpowers
-# Cloned to ~/.claude/plugins/ — registered via first-run setup script
+# Registered via Claude Code's marketplace system
 # ---------------------------------------------------------------------------
-RUN mkdir -p /home/vscode/.claude/plugins \
-    && git clone https://github.com/SawyerHood/dev-browser.git /home/vscode/.claude/plugins/dev-browser \
-    && git clone https://github.com/obra/superpowers.git /home/vscode/.claude/plugins/superpowers
+RUN claude plugin marketplace add obra/superpowers-marketplace \
+    && claude plugin marketplace add sawyerhood/dev-browser \
+    && claude plugin install superpowers@superpowers-marketplace \
+    && claude plugin install dev-browser@dev-browser-marketplace
 
 # ---------------------------------------------------------------------------
-# First-run setup script for plugin registration
+# Plugin update helper script (for refreshing plugins at runtime)
 # ---------------------------------------------------------------------------
 COPY setup-plugins.sh /home/vscode/setup-plugins.sh
 

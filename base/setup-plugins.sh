@@ -1,38 +1,24 @@
 #!/bin/bash
 # =============================================================================
-# First-run plugin setup for Claude Code
-# Registers dev-browser and superpowers plugins if not already configured
-# Run once after container start: ~/setup-plugins.sh
+# Plugin verification & update for Claude Code
+# Marketplaces and plugins are pre-installed during image build.
+# Run this to update plugins or re-install if missing: ~/setup-plugins.sh
 # =============================================================================
 set -e
 
-PLUGIN_DIR="$HOME/.claude/plugins"
-SETTINGS_DIR="$HOME/.claude"
-MARKER="$SETTINGS_DIR/.plugins-installed"
+echo "=== Claude Code Plugin Status ==="
 
-if [ -f "$MARKER" ]; then
-    echo "Plugins already registered. Skipping."
-    exit 0
-fi
+# Ensure marketplaces are registered
+claude plugin marketplace add obra/superpowers-marketplace 2>/dev/null || true
+claude plugin marketplace add sawyerhood/dev-browser 2>/dev/null || true
 
-echo "=== Registering Claude Code Plugins ==="
+# Ensure plugins are installed
+claude plugin install superpowers@superpowers-marketplace 2>/dev/null || true
+claude plugin install dev-browser@dev-browser-marketplace 2>/dev/null || true
 
-# Register dev-browser
-if [ -d "$PLUGIN_DIR/dev-browser" ]; then
-    echo "Registering dev-browser..."
-    cd "$PLUGIN_DIR/dev-browser" && npm install --production 2>/dev/null || true
-    echo "  dev-browser ready at $PLUGIN_DIR/dev-browser"
-fi
-
-# Register superpowers
-if [ -d "$PLUGIN_DIR/superpowers" ]; then
-    echo "Registering superpowers..."
-    cd "$PLUGIN_DIR/superpowers" && npm install --production 2>/dev/null || true
-    echo "  superpowers ready at $PLUGIN_DIR/superpowers"
-fi
-
-touch "$MARKER"
 echo ""
-echo "Plugin setup complete. Start Claude Code with: claude"
-echo "Then run:  /plugin install dev-browser"
-echo "           /plugin install superpowers"
+echo "Installed plugins:"
+claude plugin list 2>/dev/null || echo "  (run 'claude plugin list' to check)"
+
+echo ""
+echo "Plugin setup complete."
