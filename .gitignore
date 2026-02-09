@@ -1,2 +1,7 @@
 # Environment files (contain local paths / secrets)
 .env
+
+# Test dependencies and artifacts
+tests/node_modules/
+tests/package-lock.json
+__pycache__/
