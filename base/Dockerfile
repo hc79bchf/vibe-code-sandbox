@@ -67,6 +67,10 @@ RUN claude plugin marketplace add obra/superpowers-marketplace \
     && claude plugin install superpowers@superpowers-marketplace \
     && claude plugin install dev-browser@dev-browser-marketplace
 
+# Pre-create the project settings directory for /workspace
+# (Claude Code derives this path from the workspace mount point)
+RUN mkdir -p /home/vscode/.claude/projects/-workspace
+
 # ---------------------------------------------------------------------------
 # Plugin update helper script (for refreshing plugins at runtime)
 # ---------------------------------------------------------------------------
