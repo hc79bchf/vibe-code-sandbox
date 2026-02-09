@@ -1,16 +1,26 @@
 #!/bin/bash
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+BASE_DIR="$SCRIPT_DIR/../base"
+
 echo "=== Claude UI Sandbox Launcher ==="
+
+# Build base image if it doesn't exist
+if ! docker image inspect vibe-sandbox-base >/dev/null 2>&1; then
+    echo "Base image not found. Building..."
+    cd "$BASE_DIR" && bash build.sh
+    cd "$SCRIPT_DIR"
+fi
 
 # Stop and remove any existing sandbox container
 echo "Cleaning up existing containers..."
 docker rm -f claude-ui-sandbox 2>/dev/null || true
 docker compose down -v 2>/dev/null || true
 
-# Build the sandbox image (no cache for clean build)
-echo "Building sandbox image..."
-docker compose build --no-cache sandbox
+# Build the project image
+echo "Building project image..."
+docker compose build sandbox
 
 # Launch the sandbox container in detached mode
 echo "Starting sandbox container..."
@@ -24,3 +34,6 @@ docker ps --filter name=claude-ui-sandbox --format "table {{.ID}}\t{{.Image}}\t{
 echo ""
 echo "Sandbox is ready. Attach with:"
 echo "  docker exec -it claude-ui-sandbox /bin/bash"
+echo ""
+echo "First time? Run plugin setup inside the container:"
+echo "  docker exec -it claude-ui-sandbox ~/setup-plugins.sh"
