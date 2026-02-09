@@ -32,7 +32,6 @@ services:
     # Environment variables for the AI context
     environment:
       - NODE_ENV=development
-      # DO NOT PUT API KEYS HERE. Use a .env file locally that is .gitignored.
 
 networks:
   agent-hr-net:
