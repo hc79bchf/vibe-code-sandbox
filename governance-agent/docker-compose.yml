@@ -19,11 +19,15 @@ services:
       # Docker socket for controlling host Docker (DooD pattern)
       - /var/run/docker.sock:/var/run/docker.sock
 
+    # Claude UI Dashboard port (auto-detected by launch.sh)
+    ports:
+      - "${DASHBOARD_PORT:-8080}:8080"
+
     # Networking: Allow outbound access (for pip/npm) but you can restrict this later
     networks:
       - sandbox-net
 
-    # Entrypoint: fix Docker socket, auto-activate Vibe Guard, sleep
+    # Entrypoint: fix Docker socket, start dashboard, auto-activate Vibe Guard, sleep
     command: ["/home/vscode/entrypoint.sh"]
 
     # Environment variables for the AI context

@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y \
     gnupg \
     git \
     jq \
+    nginx \
     && rm -rf /var/lib/apt/lists/*
 
 # ---------------------------------------------------------------------------
@@ -103,6 +104,14 @@ RUN claude plugin marketplace add obra/superpowers-marketplace \
 # ---------------------------------------------------------------------------
 RUN npm install -g playwright && playwright install chromium
 
+# ---------------------------------------------------------------------------
+# Claude UI Dashboard (web UI for Claude Code sessions)
+# Clone, build frontend + backend, configure nginx reverse proxy
+# ---------------------------------------------------------------------------
+RUN git clone https://github.com/hc79bchf/claude_ui.git /home/vscode/claude-ui \
+    && cd /home/vscode/claude-ui && npm install && npm run build \
+    && cd /home/vscode/claude-ui/server && npm install && npm run build
+
 # Pre-create the project settings directory for /workspace
 # (Claude Code derives this path from the workspace mount point)
 RUN mkdir -p /home/vscode/.claude/projects/-workspace
@@ -119,6 +128,15 @@ COPY pre-commit-config.yaml /home/vscode/pre-commit-config.yaml
 USER root
 RUN chmod +x /home/vscode/setup-plugins.sh /home/vscode/setup-vibe-guard.sh /home/vscode/disable-vibe-guard.sh /home/vscode/entrypoint.sh \
     && chown vscode:vscode /home/vscode/setup-plugins.sh /home/vscode/setup-vibe-guard.sh /home/vscode/disable-vibe-guard.sh /home/vscode/entrypoint.sh /home/vscode/pre-commit-config.yaml
+
+# ---------------------------------------------------------------------------
+# Nginx reverse proxy for Claude UI Dashboard
+# Serves frontend static files + proxies /api and /ws to backend
+# ---------------------------------------------------------------------------
+COPY dashboard-nginx.conf /etc/nginx/sites-available/dashboard
+RUN rm -f /etc/nginx/sites-enabled/default \
+    && ln -sf /etc/nginx/sites-available/dashboard /etc/nginx/sites-enabled/dashboard
+
 USER vscode
 
 # ---------------------------------------------------------------------------

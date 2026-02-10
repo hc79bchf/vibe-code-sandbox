@@ -2,8 +2,9 @@
 # =============================================================================
 # Sandbox Entrypoint — runs as root, then drops to vscode
 # 1. Fix Docker socket permissions (requires root)
-# 2. Auto-activate Vibe Guard if /workspace is a git repo
-# 3. Keep container alive
+# 2. Start Claude UI Dashboard (nginx as root, backend as vscode)
+# 3. Auto-activate Vibe Guard if /workspace is a git repo
+# 4. Keep container alive
 # =============================================================================
 
 # --- Root tasks ---
@@ -12,8 +13,16 @@ if [ -S /var/run/docker.sock ]; then
     chmod 660 /var/run/docker.sock
 fi
 
+# Start nginx reverse proxy for Claude UI Dashboard (requires root)
+nginx
+
 # --- Switch to vscode for remaining tasks ---
 exec su vscode -c '
+    # Start Claude UI Dashboard backend
+    cd /home/vscode/claude-ui/server
+    HOME=/home/vscode node dist/index.js > /tmp/dashboard-backend.log 2>&1 &
+    echo "=== Claude UI Dashboard started on port 8080 ==="
+
     cd /workspace
 
     # Auto-activate Vibe Guard if workspace is a git repo

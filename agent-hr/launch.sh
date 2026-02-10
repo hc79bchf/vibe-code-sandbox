@@ -41,6 +41,13 @@ if [ ! -d "$RESOLVED_PATH" ]; then
 fi
 echo "Project path: $RESOLVED_PATH"
 
+# Auto-detect available dashboard port (avoids collisions with other sandboxes)
+DASHBOARD_PORT=${DASHBOARD_PORT:-8080}
+while lsof -i :"$DASHBOARD_PORT" >/dev/null 2>&1; do
+    DASHBOARD_PORT=$((DASHBOARD_PORT + 1))
+done
+export DASHBOARD_PORT
+
 # Build base image if it doesn't exist
 if ! docker image inspect vibe-sandbox-base >/dev/null 2>&1; then
     echo "Base image not found. Building..."
@@ -71,6 +78,7 @@ echo "Sandbox is ready. Attach with:"
 echo "  docker exec -it $CONTAINER_NAME /bin/bash"
 echo ""
 echo "Workspace mounted from: $RESOLVED_PATH"
+echo "Claude UI Dashboard:    http://localhost:$DASHBOARD_PORT"
 echo "Plugins (superpowers, dev-browser) are pre-installed."
 echo "Vibe Guard auto-activates on startup (if workspace is a git repo)."
 echo "To update plugins:     docker exec -it $CONTAINER_NAME ~/setup-plugins.sh"
