@@ -103,8 +103,12 @@ RUN claude plugin marketplace add obra/superpowers-marketplace \
 
 # ---------------------------------------------------------------------------
 # Playwright + Chromium browser (for dev-browser plugin)
+# Global install requires root; browser binary download runs as vscode
 # ---------------------------------------------------------------------------
-RUN npm install -g playwright && playwright install chromium
+USER root
+RUN npm install -g playwright
+USER vscode
+RUN playwright install chromium
 
 # ---------------------------------------------------------------------------
 # Claude UI Dashboard (web UI for Claude Code sessions)
