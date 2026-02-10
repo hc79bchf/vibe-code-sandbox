@@ -99,7 +99,7 @@ RUN claude plugin marketplace add obra/superpowers-marketplace \
     && claude plugin marketplace add EveryInc/compound-engineering-plugin \
     && claude plugin install superpowers@superpowers-marketplace \
     && claude plugin install dev-browser@dev-browser-marketplace \
-    && claude plugin install compound-engineering@compound-engineering-plugin-marketplace
+    && claude plugin install compound-engineering@every-marketplace
 
 # ---------------------------------------------------------------------------
 # Playwright + Chromium browser (for dev-browser plugin)
