@@ -91,13 +91,15 @@ USER vscode
 RUN code --install-extension anthropic.claude-code 2>/dev/null || true
 
 # ---------------------------------------------------------------------------
-# Claude Code plugins: dev-browser & superpowers
+# Claude Code plugins: dev-browser, superpowers, compound-engineering
 # Registered via Claude Code's marketplace system
 # ---------------------------------------------------------------------------
 RUN claude plugin marketplace add obra/superpowers-marketplace \
     && claude plugin marketplace add sawyerhood/dev-browser \
+    && claude plugin marketplace add EveryInc/compound-engineering-plugin \
     && claude plugin install superpowers@superpowers-marketplace \
-    && claude plugin install dev-browser@dev-browser-marketplace
+    && claude plugin install dev-browser@dev-browser-marketplace \
+    && claude plugin install compound-engineering@compound-engineering-plugin-marketplace
 
 # ---------------------------------------------------------------------------
 # Playwright + Chromium browser (for dev-browser plugin)
