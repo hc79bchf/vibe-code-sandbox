@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: governance-sandbox
+    container_name: ${SANDBOX_NAME}-sandbox
 
     # Required for VSCode/Antigravity attach
     stdin_open: true
@@ -13,7 +13,7 @@ services:
     user: root
 
     # Mount the project repo to /workspace in the container
-    # Set PROJECT_PATH in .env (see .env.example)
+    # Set PROJECT_PATH and SANDBOX_NAME in .env (see .env.example)
     volumes:
       - ${PROJECT_PATH:-.}:/workspace
       # Docker socket for controlling host Docker (DooD pattern)
@@ -21,7 +21,7 @@ services:
 
     # Networking: Allow outbound access (for pip/npm) but you can restrict this later
     networks:
-      - governance-net
+      - sandbox-net
 
     # Entrypoint: fix Docker socket, auto-activate Vibe Guard, sleep
     command: ["/home/vscode/entrypoint.sh"]
@@ -31,5 +31,5 @@ services:
       - NODE_ENV=development
 
 networks:
-  governance-net:
+  sandbox-net:
     driver: bridge

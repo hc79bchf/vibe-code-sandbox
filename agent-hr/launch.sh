@@ -4,23 +4,32 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 BASE_DIR="$SCRIPT_DIR/../base"
 
-echo "=== Agent HR Sandbox Launcher ==="
-
-# Check for .env with PROJECT_PATH
+# Check for .env
 if [ ! -f "$SCRIPT_DIR/.env" ]; then
     echo ""
     echo "ERROR: No .env file found."
     echo ""
-    echo "Set up your project workspace:"
-    echo "  1. Clone your project repo:  git clone <repo-url> ~/projects/agent-hr"
-    echo "  2. Create .env:              cp .env.example .env"
-    echo "  3. Edit .env with the path to your project repo"
-    echo "  4. Re-run:                   bash launch.sh"
+    echo "Set up your sandbox:"
+    echo "  1. Copy .env.example:  cp .env.example .env"
+    echo "  2. Edit .env with SANDBOX_NAME and PROJECT_PATH"
+    echo "  3. Re-run:             bash launch.sh"
     exit 1
 fi
 
-# Validate PROJECT_PATH exists
+# Load config
 source "$SCRIPT_DIR/.env"
+
+# Validate SANDBOX_NAME
+if [ -z "$SANDBOX_NAME" ]; then
+    echo "ERROR: SANDBOX_NAME not set in .env"
+    exit 1
+fi
+
+CONTAINER_NAME="${SANDBOX_NAME}-sandbox"
+
+echo "=== ${SANDBOX_NAME} Sandbox Launcher ==="
+
+# Validate PROJECT_PATH exists
 RESOLVED_PATH="${PROJECT_PATH/#\~/$HOME}"
 if [ ! -d "$RESOLVED_PATH" ]; then
     echo ""
@@ -41,7 +50,7 @@ fi
 
 # Stop and remove any existing sandbox container
 echo "Cleaning up existing containers..."
-docker rm -f agent-hr-sandbox 2>/dev/null || true
+docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
 docker compose down -v 2>/dev/null || true
 
 # Build the project image
@@ -55,14 +64,14 @@ docker compose up -d
 # Verify the container is running
 echo ""
 echo "=== Container Status ==="
-docker ps --filter name=agent-hr-sandbox --format "table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Names}}"
+docker ps --filter name="$CONTAINER_NAME" --format "table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Names}}"
 
 echo ""
 echo "Sandbox is ready. Attach with:"
-echo "  docker exec -it agent-hr-sandbox /bin/bash"
+echo "  docker exec -it $CONTAINER_NAME /bin/bash"
 echo ""
 echo "Workspace mounted from: $RESOLVED_PATH"
 echo "Plugins (superpowers, dev-browser) are pre-installed."
 echo "Vibe Guard auto-activates on startup (if workspace is a git repo)."
-echo "To update plugins:     docker exec -it agent-hr-sandbox ~/setup-plugins.sh"
-echo "To disable Vibe Guard: docker exec -it agent-hr-sandbox bash -c 'cd /workspace && ~/disable-vibe-guard.sh'"
+echo "To update plugins:     docker exec -it $CONTAINER_NAME ~/setup-plugins.sh"
+echo "To disable Vibe Guard: docker exec -it $CONTAINER_NAME bash -c 'cd /workspace && ~/disable-vibe-guard.sh'"
