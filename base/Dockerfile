@@ -43,6 +43,11 @@ RUN install -m 0755 -d /etc/apt/keyrings \
 RUN groupadd -f docker && usermod -aG docker vscode
 
 # ---------------------------------------------------------------------------
+# Playwright system dependencies (required for Chromium in dev-browser)
+# ---------------------------------------------------------------------------
+RUN npx playwright install-deps chromium
+
+# ---------------------------------------------------------------------------
 # Socket Security CLI
 # ---------------------------------------------------------------------------
 RUN npm install -g @socketsecurity/cli
@@ -92,6 +97,11 @@ RUN claude plugin marketplace add obra/superpowers-marketplace \
     && claude plugin marketplace add sawyerhood/dev-browser \
     && claude plugin install superpowers@superpowers-marketplace \
     && claude plugin install dev-browser@dev-browser-marketplace
+
+# ---------------------------------------------------------------------------
+# Playwright + Chromium browser (for dev-browser plugin)
+# ---------------------------------------------------------------------------
+RUN npm install -g playwright && playwright install chromium
 
 # Pre-create the project settings directory for /workspace
 # (Claude Code derives this path from the workspace mount point)
