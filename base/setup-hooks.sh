@@ -1,19 +1,20 @@
 #!/bin/bash
 # =============================================================================
-# Configure Claude Code hooks for ntfy.sh push notifications
+# Configure Claude Code settings at container startup
 # Usage: setup-hooks.sh <topic>
-# Sends notifications to ntfy.sh/<topic>-sandbox on Stop and Notification events
+#   - ntfy.sh push notifications on Stop and Notification events
+#   - Agent Teams experimental feature
 # =============================================================================
 
 TOPIC="${1:-sandbox}"
 SETTINGS="$HOME/.claude/settings.json"
 
 if [ ! -f "$SETTINGS" ]; then
-    echo "No settings.json found at $SETTINGS, skipping hooks setup"
+    echo "No settings.json found at $SETTINGS, skipping setup"
     exit 0
 fi
 
-# Build the hooks JSON and merge into existing settings
+# Merge hooks + agent teams env into existing settings (preserves plugins, permissions)
 jq --arg topic "$TOPIC" '
 .hooks = {
     "Stop": [{
@@ -30,6 +31,9 @@ jq --arg topic "$TOPIC" '
             "command": ("curl -s -d \"Attention needed in " + $topic + " sandbox\" ntfy.sh/" + $topic + "-sandbox")
         }]
     }]
-}' "$SETTINGS" > "${SETTINGS}.tmp" && mv "${SETTINGS}.tmp" "$SETTINGS"
+}
+| .env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1"
+' "$SETTINGS" > "${SETTINGS}.tmp" && mv "${SETTINGS}.tmp" "$SETTINGS"
 
 echo "=== ntfy.sh notifications enabled (topic: ${TOPIC}-sandbox) ==="
+echo "=== Agent Teams enabled ==="
