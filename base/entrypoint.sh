@@ -4,8 +4,9 @@
 # 1. Fix Docker socket permissions (requires root)
 # 2. Configure Claude Code hooks for ntfy.sh notifications
 # 3. Start Claude UI Dashboard (nginx as root, backend as vscode)
-# 4. Auto-activate Vibe Guard if /workspace is a git repo
-# 5. Keep container alive
+# 4. Start Vibecraft 3D visualization
+# 5. Auto-activate Vibe Guard if /workspace is a git repo
+# 6. Keep container alive
 # =============================================================================
 
 # --- Root tasks ---
@@ -27,6 +28,12 @@ exec su vscode -c '
     cd /home/vscode/claude-ui/server
     HOME=/home/vscode node dist/index.js > /tmp/dashboard-backend.log 2>&1 &
     echo "=== Claude UI Dashboard started on port 8080 ==="
+
+    # Start Vibecraft 3D visualization
+    cd /home/vscode
+    HOME=/home/vscode npx vibecraft setup 2>/dev/null || true
+    HOME=/home/vscode npx vibecraft > /tmp/vibecraft.log 2>&1 &
+    echo "=== Vibecraft 3D Workshop started on port 4003 ==="
 
     cd /workspace
 
