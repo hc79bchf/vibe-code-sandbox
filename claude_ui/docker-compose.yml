@@ -33,6 +33,7 @@ services:
     # Environment variables for the AI context
     environment:
       - NODE_ENV=development
+      - SANDBOX_NAME=${SANDBOX_NAME}
 
 networks:
   sandbox-net:
