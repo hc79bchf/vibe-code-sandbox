@@ -18,6 +18,8 @@ services:
       - ${PROJECT_PATH:-.}:/workspace
       # Docker socket for controlling host Docker (DooD pattern)
       - /var/run/docker.sock:/var/run/docker.sock
+      # Shared vibecraft events (written by other sandboxes)
+      - vibecraft-data:/home/vscode/.vibecraft/data
 
     # Vibecraft 3D visualization
     ports:
@@ -34,6 +36,10 @@ services:
     environment:
       - NODE_ENV=development
       - SANDBOX_NAME=${SANDBOX_NAME}
+
+volumes:
+  vibecraft-data:
+    external: true
 
 networks:
   sandbox-net:

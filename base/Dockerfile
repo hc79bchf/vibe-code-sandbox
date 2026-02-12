@@ -123,11 +123,12 @@ COPY disable-vibe-guard.sh /home/vscode/disable-vibe-guard.sh
 COPY setup-hooks.sh /home/vscode/setup-hooks.sh
 COPY entrypoint.sh /home/vscode/entrypoint.sh
 COPY pre-commit-config.yaml /home/vscode/pre-commit-config.yaml
+COPY vibecraft-hook.sh /home/vscode/vibecraft-hook.sh
 
 USER root
 RUN chmod o+x /home/vscode \
-    && chmod +x /home/vscode/setup-plugins.sh /home/vscode/setup-vibe-guard.sh /home/vscode/disable-vibe-guard.sh /home/vscode/setup-hooks.sh /home/vscode/entrypoint.sh \
-    && chown vscode:vscode /home/vscode/setup-plugins.sh /home/vscode/setup-vibe-guard.sh /home/vscode/disable-vibe-guard.sh /home/vscode/setup-hooks.sh /home/vscode/entrypoint.sh /home/vscode/pre-commit-config.yaml
+    && chmod +x /home/vscode/setup-plugins.sh /home/vscode/setup-vibe-guard.sh /home/vscode/disable-vibe-guard.sh /home/vscode/setup-hooks.sh /home/vscode/entrypoint.sh /home/vscode/vibecraft-hook.sh \
+    && chown vscode:vscode /home/vscode/setup-plugins.sh /home/vscode/setup-vibe-guard.sh /home/vscode/disable-vibe-guard.sh /home/vscode/setup-hooks.sh /home/vscode/entrypoint.sh /home/vscode/pre-commit-config.yaml /home/vscode/vibecraft-hook.sh
 
 USER vscode
 

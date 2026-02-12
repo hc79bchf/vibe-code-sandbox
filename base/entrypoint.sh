@@ -13,6 +13,9 @@ if [ -S /var/run/docker.sock ]; then
     chmod 660 /var/run/docker.sock
 fi
 
+# Fix vibecraft data directory ownership (Docker volume creates it as root)
+chown -R vscode:vscode /home/vscode/.vibecraft 2>/dev/null || true
+
 # Configure Claude Code hooks for ntfy.sh push notifications
 # Uses SANDBOX_NAME env var (from docker-compose) as the ntfy topic
 su vscode -c "HOME=/home/vscode /home/vscode/setup-hooks.sh '${SANDBOX_NAME:-sandbox}'"
