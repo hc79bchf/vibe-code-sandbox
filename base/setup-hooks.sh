@@ -10,6 +10,7 @@
 TOPIC="${1:-sandbox}"
 SETTINGS="$HOME/.claude/settings.json"
 VIBECRAFT_HOOK="$HOME/.vibecraft/hooks/vibecraft-hook.sh"
+AUTOLINK_HOOK="$HOME/vibecraft-autolink.sh"
 
 if [ ! -f "$SETTINGS" ]; then
     echo "No settings.json found at $SETTINGS, skipping setup"
@@ -26,7 +27,7 @@ if [ ! -f "$VIBECRAFT_HOOK" ] && [ -f "$HOME/vibecraft-hook.sh" ]; then
 fi
 
 # Build hooks JSON with ntfy + vibecraft
-jq --arg topic "$TOPIC" --arg vhook "$VIBECRAFT_HOOK" '
+jq --arg topic "$TOPIC" --arg vhook "$VIBECRAFT_HOOK" --arg autolink "$AUTOLINK_HOOK" '
 def vibecraft_hook: {
     "hooks": [{
         "type": "command",
@@ -68,7 +69,16 @@ def vibecraft_hook_all: {
     "PreToolUse": [vibecraft_hook_all],
     "PostToolUse": [vibecraft_hook_all],
     "SubagentStop": [vibecraft_hook],
-    "SessionStart": [vibecraft_hook],
+    "SessionStart": [
+        vibecraft_hook,
+        {
+            "hooks": [{
+                "type": "command",
+                "command": $autolink,
+                "timeout": 10
+            }]
+        }
+    ],
     "SessionEnd": [vibecraft_hook],
     "UserPromptSubmit": [vibecraft_hook]
 }
