@@ -41,13 +41,6 @@ if [ ! -d "$RESOLVED_PATH" ]; then
 fi
 echo "Project path: $RESOLVED_PATH"
 
-# Auto-detect available dashboard port (avoids collisions with other sandboxes)
-DASHBOARD_PORT=${DASHBOARD_PORT:-8084}
-while lsof -i :"$DASHBOARD_PORT" >/dev/null 2>&1; do
-    DASHBOARD_PORT=$((DASHBOARD_PORT + 1))
-done
-export DASHBOARD_PORT
-
 # Auto-detect available vibecraft port
 VIBECRAFT_PORT=${VIBECRAFT_PORT:-4004}
 while lsof -i :"$VIBECRAFT_PORT" >/dev/null 2>&1; do
@@ -85,7 +78,6 @@ echo "Sandbox is ready. Attach with:"
 echo "  docker exec -it $CONTAINER_NAME /bin/bash"
 echo ""
 echo "Workspace mounted from: $RESOLVED_PATH"
-echo "Claude UI Dashboard:    http://localhost:$DASHBOARD_PORT"
 echo "Vibecraft 3D Workshop:  http://localhost:$VIBECRAFT_PORT"
 echo "Plugins (superpowers, dev-browser) are pre-installed."
 echo "Vibe Guard auto-activates on startup (if workspace is a git repo)."
