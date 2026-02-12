@@ -19,10 +19,13 @@ su vscode -c "HOME=/home/vscode /home/vscode/setup-hooks.sh '${SANDBOX_NAME:-san
 
 # --- Switch to vscode for remaining tasks ---
 exec su vscode -c '
-    # Start Vibecraft 3D visualization
+    # Start Vibecraft 3D visualization (setup only runs once)
     cd /home/vscode
-    HOME=/home/vscode npx vibecraft setup 2>/dev/null || true
-    HOME=/home/vscode npx vibecraft > /tmp/vibecraft.log 2>&1 &
+    if [ ! -f /home/vscode/.vibecraft-setup-done ]; then
+        HOME=/home/vscode npx vibecraft setup 2>/dev/null || true
+        touch /home/vscode/.vibecraft-setup-done
+    fi
+    BROWSER=none HOME=/home/vscode npx vibecraft > /tmp/vibecraft.log 2>&1 &
     echo "=== Vibecraft 3D Workshop started on port 4003 ==="
 
     cd /workspace

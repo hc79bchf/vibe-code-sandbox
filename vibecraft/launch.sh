@@ -42,7 +42,7 @@ fi
 echo "Project path: $RESOLVED_PATH"
 
 # Auto-detect available vibecraft port
-VIBECRAFT_PORT=${VIBECRAFT_PORT:-4004}
+VIBECRAFT_PORT=${VIBECRAFT_PORT:-4003}
 while lsof -i :"$VIBECRAFT_PORT" >/dev/null 2>&1; do
     VIBECRAFT_PORT=$((VIBECRAFT_PORT + 1))
 done

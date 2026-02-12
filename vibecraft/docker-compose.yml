@@ -21,7 +21,7 @@ services:
 
     # Vibecraft 3D visualization
     ports:
-      - "${VIBECRAFT_PORT:-4004}:4003"
+      - "${VIBECRAFT_PORT:-4003}:4003"
 
     # Networking: Allow outbound access (for pip/npm) but you can restrict this later
     networks:
