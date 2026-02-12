@@ -36,6 +36,8 @@ services:
     environment:
       - NODE_ENV=development
       - SANDBOX_NAME=${SANDBOX_NAME}
+      # Host port passed to container so frontend WebSocket URL matches
+      - VIBECRAFT_HOST_PORT=${VIBECRAFT_PORT:-4003}
 
 volumes:
   vibecraft-data:

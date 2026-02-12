@@ -20,6 +20,15 @@ chown -R vscode:vscode /home/vscode/.vibecraft 2>/dev/null || true
 # Configure Claude Code hooks for ntfy.sh push notifications
 su vscode -c "HOME=/home/vscode /home/vscode/setup-hooks.sh '${SANDBOX_NAME:-sandbox}'"
 
+# Patch vibecraft frontend to use the actual host port for WebSocket
+# (vibecraft defaults to 4003; this ensures it matches the Docker-mapped host port)
+DIST_HTML="/usr/lib/node_modules/vibecraft/dist/index.html"
+HOST_PORT="${VIBECRAFT_HOST_PORT:-4003}"
+if [ -f "$DIST_HTML" ]; then
+    sed -i 's|<script id="vibecraft-port-override">.*</script>||' "$DIST_HTML"
+    sed -i "s|<head>|<head><script id=\"vibecraft-port-override\">localStorage.setItem('vibecraft-agent-port','${HOST_PORT}');</script>|" "$DIST_HTML"
+fi
+
 # --- Switch to vscode for remaining tasks ---
 exec su vscode -c '
     # Start Vibecraft 3D visualization (setup only runs once)
@@ -29,7 +38,7 @@ exec su vscode -c '
         touch /home/vscode/.vibecraft-setup-done
     fi
     BROWSER=none HOME=/home/vscode npx vibecraft > /tmp/vibecraft.log 2>&1 &
-    echo "=== Vibecraft 3D Workshop started on port 4003 ==="
+    echo "=== Vibecraft 3D Workshop started ==="
 
     cd /workspace
 
