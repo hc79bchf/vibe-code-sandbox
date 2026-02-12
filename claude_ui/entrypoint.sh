@@ -1,10 +1,11 @@
 #!/bin/bash
 # =============================================================================
-# Sandbox Entrypoint — runs as root, then drops to vscode
+# Claude UI Sandbox Entrypoint — extends base with Claude UI Dashboard
 # 1. Fix Docker socket permissions (requires root)
 # 2. Configure Claude Code hooks for ntfy.sh notifications
-# 3. Auto-activate Vibe Guard if /workspace is a git repo
-# 4. Keep container alive
+# 3. Start Claude UI Dashboard (nginx as root, backend as vscode)
+# 4. Auto-activate Vibe Guard if /workspace is a git repo
+# 5. Keep container alive
 # =============================================================================
 
 # --- Root tasks ---
@@ -14,11 +15,18 @@ if [ -S /var/run/docker.sock ]; then
 fi
 
 # Configure Claude Code hooks for ntfy.sh push notifications
-# Uses SANDBOX_NAME env var (from docker-compose) as the ntfy topic
 su vscode -c "HOME=/home/vscode /home/vscode/setup-hooks.sh '${SANDBOX_NAME:-sandbox}'"
+
+# Start nginx reverse proxy for Claude UI Dashboard (requires root)
+nginx
 
 # --- Switch to vscode for remaining tasks ---
 exec su vscode -c '
+    # Start Claude UI Dashboard backend
+    cd /home/vscode/claude-ui/server
+    HOME=/home/vscode node dist/index.js > /tmp/dashboard-backend.log 2>&1 &
+    echo "=== Claude UI Dashboard started on port 8080 ==="
+
     cd /workspace
 
     # Auto-activate Vibe Guard if workspace is a git repo

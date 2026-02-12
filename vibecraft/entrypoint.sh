@@ -1,10 +1,11 @@
 #!/bin/bash
 # =============================================================================
-# Sandbox Entrypoint — runs as root, then drops to vscode
+# Vibecraft Sandbox Entrypoint — extends base with Vibecraft 3D visualization
 # 1. Fix Docker socket permissions (requires root)
 # 2. Configure Claude Code hooks for ntfy.sh notifications
-# 3. Auto-activate Vibe Guard if /workspace is a git repo
-# 4. Keep container alive
+# 3. Start Vibecraft 3D visualization
+# 4. Auto-activate Vibe Guard if /workspace is a git repo
+# 5. Keep container alive
 # =============================================================================
 
 # --- Root tasks ---
@@ -14,11 +15,16 @@ if [ -S /var/run/docker.sock ]; then
 fi
 
 # Configure Claude Code hooks for ntfy.sh push notifications
-# Uses SANDBOX_NAME env var (from docker-compose) as the ntfy topic
 su vscode -c "HOME=/home/vscode /home/vscode/setup-hooks.sh '${SANDBOX_NAME:-sandbox}'"
 
 # --- Switch to vscode for remaining tasks ---
 exec su vscode -c '
+    # Start Vibecraft 3D visualization
+    cd /home/vscode
+    HOME=/home/vscode npx vibecraft setup 2>/dev/null || true
+    HOME=/home/vscode npx vibecraft > /tmp/vibecraft.log 2>&1 &
+    echo "=== Vibecraft 3D Workshop started on port 4003 ==="
+
     cd /workspace
 
     # Auto-activate Vibe Guard if workspace is a git repo
