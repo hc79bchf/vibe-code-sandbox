@@ -32,6 +32,8 @@ services:
     environment:
       - NODE_ENV=development
       - SANDBOX_NAME=${SANDBOX_NAME}
+      # Vibecraft: notify server on host via Docker Desktop bridge
+      - VIBECRAFT_WS_NOTIFY=http://host.docker.internal:4003/event
 
 volumes:
   vibecraft-data:
