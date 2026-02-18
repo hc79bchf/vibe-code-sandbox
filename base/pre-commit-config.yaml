@@ -22,6 +22,24 @@ repos:
     hooks:
       - id: gitleaks
 
+  # Layer 3: Test coverage gate (80% minimum)
+  - repo: local
+    hooks:
+      - id: coverage-py
+        name: Python test coverage (80% min)
+        entry: bash -c 'if [ -f pytest.ini ] || [ -f setup.py ] || [ -f pyproject.toml ] || [ -d tests ]; then python -m pytest --cov=. --cov-fail-under=80 -q 2>/dev/null || { echo "FAIL: Python test coverage below 80%"; exit 1; }; fi'
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-commit]
+      - id: coverage-js
+        name: JS/TS test coverage (80% min)
+        entry: bash -c 'if [ -f package.json ]; then if grep -q "vitest" package.json 2>/dev/null; then npx vitest run --coverage --coverage.thresholds.lines=80 --coverage.thresholds.functions=80 --coverage.thresholds.branches=80 2>/dev/null || { echo "FAIL: JS/TS test coverage below 80%"; exit 1; }; elif grep -q "jest" package.json 2>/dev/null; then npx jest --coverage --coverageThreshold='\''{"global":{"lines":80,"functions":80,"branches":80}}'\'' 2>/dev/null || { echo "FAIL: JS/TS test coverage below 80%"; exit 1; }; fi; fi'
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-commit]
+
   # General hygiene
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0

@@ -58,6 +58,17 @@ RUN npm install -g @socketsecurity/cli
 # ---------------------------------------------------------------------------
 RUN npm install -g @anthropic-ai/claude-code
 
+# ---------------------------------------------------------------------------
+# Railway CLI (https://railway.com — deploy from sandbox)
+# ---------------------------------------------------------------------------
+RUN npm install -g @railway/cli
+
+# ---------------------------------------------------------------------------
+# Letta Code — context repository memory for coding agents
+# (https://www.letta.com/blog/context-repositories)
+# ---------------------------------------------------------------------------
+RUN npm install -g @letta-ai/letta-code
+
 # ===========================================================================
 # Vibe Guard — 3-Layer Auto-Scan System
 # ===========================================================================
@@ -67,7 +78,7 @@ RUN npm install -g @anthropic-ai/claude-code
 #   - Ruff: Python linter+formatter (replaces Flake8, Black, Isort)
 #   - Biome: JS/TS linter+formatter (replaces ESLint + Prettier)
 # ---------------------------------------------------------------------------
-RUN pip3 install ruff \
+RUN pip3 install ruff pytest-cov \
     && npm install -g @biomejs/biome
 
 # ---------------------------------------------------------------------------
