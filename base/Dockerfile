@@ -61,7 +61,7 @@ RUN npm install -g @anthropic-ai/claude-code
 # ---------------------------------------------------------------------------
 # Railway CLI (https://railway.com — deploy from sandbox)
 # ---------------------------------------------------------------------------
-RUN npm install -g @railway/cli
+RUN curl -fsSL cli.new | bash -s -- -y
 
 # ---------------------------------------------------------------------------
 # Letta Code — context repository memory for coding agents
