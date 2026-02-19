@@ -33,6 +33,15 @@ exec su vscode -c '
         else
             echo "Vibe Guard already active."
         fi
+
+        # Auto-init OpenSpec if not already initialized
+        if [ ! -d openspec ]; then
+            echo "=== Initializing OpenSpec ==="
+            openspec init 2>/dev/null || true
+            echo ""
+        else
+            echo "OpenSpec already initialized."
+        fi
     else
         echo "Workspace is not a git repo. Skipping Vibe Guard auto-setup."
         echo "  To activate later: cd /workspace && ~/setup-vibe-guard.sh"

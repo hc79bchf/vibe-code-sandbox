@@ -69,6 +69,12 @@ RUN curl -fsSL cli.new | bash -s -- -y
 # ---------------------------------------------------------------------------
 RUN npm install -g @letta-ai/letta-code
 
+# ---------------------------------------------------------------------------
+# OpenSpec — spec-driven development for AI coding assistants
+# (https://github.com/Fission-AI/OpenSpec)
+# ---------------------------------------------------------------------------
+RUN npm install -g @fission-ai/openspec@latest
+
 # ===========================================================================
 # Vibe Guard — 3-Layer Auto-Scan System
 # ===========================================================================
@@ -124,6 +130,7 @@ RUN playwright install chromium
 # Pre-create the project settings directory for /workspace
 # (Claude Code derives this path from the workspace mount point)
 RUN mkdir -p /home/vscode/.claude/projects/-workspace
+COPY workspace-claude.md /home/vscode/.claude/projects/-workspace/CLAUDE.md
 
 # ---------------------------------------------------------------------------
 # Helper scripts and config templates
@@ -140,7 +147,8 @@ COPY vibecraft-autolink.sh /home/vscode/vibecraft-autolink.sh
 USER root
 RUN chmod o+x /home/vscode \
     && chmod +x /home/vscode/setup-plugins.sh /home/vscode/setup-vibe-guard.sh /home/vscode/disable-vibe-guard.sh /home/vscode/setup-hooks.sh /home/vscode/entrypoint.sh /home/vscode/vibecraft-hook.sh /home/vscode/vibecraft-autolink.sh \
-    && chown vscode:vscode /home/vscode/setup-plugins.sh /home/vscode/setup-vibe-guard.sh /home/vscode/disable-vibe-guard.sh /home/vscode/setup-hooks.sh /home/vscode/entrypoint.sh /home/vscode/pre-commit-config.yaml /home/vscode/vibecraft-hook.sh /home/vscode/vibecraft-autolink.sh
+    && chown vscode:vscode /home/vscode/setup-plugins.sh /home/vscode/setup-vibe-guard.sh /home/vscode/disable-vibe-guard.sh /home/vscode/setup-hooks.sh /home/vscode/entrypoint.sh /home/vscode/pre-commit-config.yaml /home/vscode/vibecraft-hook.sh /home/vscode/vibecraft-autolink.sh \
+    && chown -R vscode:vscode /home/vscode/.claude
 
 USER vscode
 
