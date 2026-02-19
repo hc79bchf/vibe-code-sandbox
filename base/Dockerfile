@@ -133,6 +133,12 @@ RUN mkdir -p /home/vscode/.claude/projects/-workspace
 COPY workspace-claude.md /home/vscode/.claude/projects/-workspace/CLAUDE.md
 
 # ---------------------------------------------------------------------------
+# Claude Code slash commands (available as /implement in Claude Code)
+# ---------------------------------------------------------------------------
+RUN mkdir -p /home/vscode/.claude/commands
+COPY commands/ /home/vscode/.claude/commands/
+
+# ---------------------------------------------------------------------------
 # Helper scripts and config templates
 # ---------------------------------------------------------------------------
 COPY setup-plugins.sh /home/vscode/setup-plugins.sh
