@@ -1,0 +1,44 @@
+services:
+  sandbox:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ${SANDBOX_NAME}-sandbox
+
+    # Required for VSCode/Antigravity attach
+    stdin_open: true
+    tty: true
+
+    # Start as root to fix Docker socket permissions, then drop to vscode
+    user: root
+
+    # Mount the project repo to /workspace in the container
+    # Set PROJECT_PATH and SANDBOX_NAME in .env (see .env.example)
+    volumes:
+      - ${PROJECT_PATH:-.}:/workspace
+      # Docker socket for controlling host Docker (DooD pattern)
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Shared vibecraft events (monitored by vibecraft-sandbox)
+      - vibecraft-data:/home/vscode/.vibecraft/data
+
+    # Networking: Allow outbound access (for pip/npm) but you can restrict this later
+    networks:
+      - sandbox-net
+
+    # Entrypoint: fix Docker socket, auto-activate Vibe Guard, sleep
+    command: ["/home/vscode/entrypoint.sh"]
+
+    # Environment variables for the AI context
+    environment:
+      - NODE_ENV=development
+      - SANDBOX_NAME=${SANDBOX_NAME}
+      # Vibecraft: notify server on host via Docker Desktop bridge
+      - VIBECRAFT_WS_NOTIFY=http://host.docker.internal:${VIBECRAFT_PORT:-4003}/event
+
+volumes:
+  vibecraft-data:
+    external: true
+
+networks:
+  sandbox-net:
+    driver: bridge
