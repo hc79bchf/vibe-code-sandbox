@@ -56,7 +56,7 @@ RUN npm install -g @socketsecurity/cli
 # ---------------------------------------------------------------------------
 # Claude Code CLI
 # ---------------------------------------------------------------------------
-RUN npm install -g @anthropic-ai/claude-code
+RUN npm install -g @anthropic-ai/claude-code@latest
 
 # ---------------------------------------------------------------------------
 # Railway CLI (https://railway.com — deploy from sandbox)
