@@ -16,6 +16,15 @@ fi
 # Fix vibecraft data directory ownership (Docker volume creates it as root)
 chown -R vscode:vscode /home/vscode/.vibecraft 2>/dev/null || true
 
+# Patch: fix remote-control bridge spawning for npm-installed Claude Code (requires root)
+# The bridge uses process.execPath (node binary) instead of the claude script,
+# causing "bad option: --sdk-url" errors. Replace with Mc6() which resolves correctly.
+CLI_JS="/usr/lib/node_modules/@anthropic-ai/claude-code/cli.js"
+if [ -f "$CLI_JS" ] && grep -q "execPath:process.execPath,env:process.env,verbose:q" "$CLI_JS"; then
+    sed -i "s/execPath:process.execPath,env:process.env,verbose:q/execPath:Mc6(),env:process.env,verbose:q/" "$CLI_JS"
+    echo "Applied remote-control bridge fix."
+fi
+
 # Configure Claude Code hooks for ntfy.sh push notifications
 # Uses SANDBOX_NAME env var (from docker-compose) as the ntfy topic
 su vscode -c "HOME=/home/vscode /home/vscode/setup-hooks.sh '${SANDBOX_NAME:-sandbox}'"
