@@ -14,4 +14,10 @@
 | ID | Time | T | Title | Read |
 |----|------|---|-------|------|
 | #428 | 10:58 AM | 🟣 | Created polymarket sandbox project folder | ~430 |
+
+### Feb 24, 2026
+
+| ID | Time | T | Title | Read |
+|----|------|---|-------|------|
+| #475 | 8:41 PM | 🔴 | Added CLAUDE_CODE_TEAMMATE_COMMAND environment variable to fix remote control bridge spawning | ~425 |
 </claude-mem-context>
