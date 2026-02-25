@@ -34,6 +34,8 @@ services:
       - SANDBOX_NAME=${SANDBOX_NAME}
       # Vibecraft: notify server on host via Docker Desktop bridge
       - VIBECRAFT_WS_NOTIFY=http://host.docker.internal:${VIBECRAFT_PORT:-4003}/event
+      # Remote Control: enable claude.ai/code remote access to this sandbox
+      - ENABLE_REMOTE_CONTROL=${ENABLE_REMOTE_CONTROL:-false}
 
 volumes:
   vibecraft-data:

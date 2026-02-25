@@ -47,5 +47,12 @@ exec su vscode -c '
         echo "  To activate later: cd /workspace && ~/setup-vibe-guard.sh"
     fi
 
+    # Auto-enable Remote Control if ENABLE_REMOTE_CONTROL=true
+    if [ "${ENABLE_REMOTE_CONTROL}" = "true" ]; then
+        echo "=== Enabling Remote Control ==="
+        ~/setup-remote-control.sh
+        echo ""
+    fi
+
     sleep infinity
 '
