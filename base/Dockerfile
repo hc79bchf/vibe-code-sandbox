@@ -105,7 +105,8 @@ RUN pip3 install pre-commit
 # VS Code Claude Code extension (pre-installed for devcontainer attach)
 # ---------------------------------------------------------------------------
 USER vscode
-RUN code --install-extension anthropic.claude-code 2>/dev/null || true
+RUN code --install-extension anthropic.claude-code 2>/dev/null || true \
+    && code --install-extension shd101wyy.markdown-preview-enhanced 2>/dev/null || true
 
 # ---------------------------------------------------------------------------
 # Claude Code plugins: dev-browser, superpowers, compound-engineering
