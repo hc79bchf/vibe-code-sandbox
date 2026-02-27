@@ -63,5 +63,10 @@ exec su vscode -c '
         echo ""
     fi
 
+    # Ensure Ralph (autonomous agent loop) marketplace is registered
+    claude plugin marketplace add snarktank/ralph 2>/dev/null || true
+    claude plugin install ralph-skills@ralph-marketplace 2>/dev/null || true
+    echo "Ralph agent loop ready. Use /prd to create PRDs, /ralph to run the loop."
+
     sleep infinity
 '

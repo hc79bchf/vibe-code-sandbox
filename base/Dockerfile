@@ -109,15 +109,17 @@ RUN code --install-extension anthropic.claude-code 2>/dev/null || true \
     && code --install-extension shd101wyy.markdown-preview-enhanced 2>/dev/null || true
 
 # ---------------------------------------------------------------------------
-# Claude Code plugins: dev-browser, superpowers, compound-engineering
+# Claude Code plugins: dev-browser, superpowers, compound-engineering, ralph
 # Registered via Claude Code's marketplace system
 # ---------------------------------------------------------------------------
 RUN claude plugin marketplace add obra/superpowers-marketplace \
     && claude plugin marketplace add sawyerhood/dev-browser \
     && claude plugin marketplace add EveryInc/compound-engineering-plugin \
+    && claude plugin marketplace add snarktank/ralph \
     && claude plugin install superpowers@superpowers-marketplace \
     && claude plugin install dev-browser@dev-browser-marketplace \
-    && claude plugin install compound-engineering@every-marketplace
+    && claude plugin install compound-engineering@every-marketplace \
+    && claude plugin install ralph-skills@ralph-marketplace
 
 # ---------------------------------------------------------------------------
 # Playwright + Chromium browser (for dev-browser plugin)
