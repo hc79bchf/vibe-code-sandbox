@@ -11,11 +11,13 @@ echo "=== Claude Code Plugin Status ==="
 # Ensure marketplaces are registered
 claude plugin marketplace add obra/superpowers-marketplace 2>/dev/null || true
 claude plugin marketplace add sawyerhood/dev-browser 2>/dev/null || true
+claude plugin marketplace add EveryInc/compound-engineering-plugin 2>/dev/null || true
 claude plugin marketplace add snarktank/ralph 2>/dev/null || true
 
 # Ensure plugins are installed
 claude plugin install superpowers@superpowers-marketplace 2>/dev/null || true
 claude plugin install dev-browser@dev-browser-marketplace 2>/dev/null || true
+claude plugin install compound-engineering@every-marketplace 2>/dev/null || true
 claude plugin install ralph-skills@ralph-marketplace 2>/dev/null || true
 
 echo ""
