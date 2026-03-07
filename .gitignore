@@ -1,3 +1,6 @@
+# macOS metadata
+.DS_Store
+
 # Environment files (contain local paths / secrets)
 .env
 
