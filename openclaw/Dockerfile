@@ -1,0 +1,6 @@
+# Inherit from shared base image (build base first: cd ../base && ./build.sh)
+FROM vibe-sandbox-base
+
+# Add project-specific dependencies below
+# RUN pip install ...
+# RUN npm install -g ...
