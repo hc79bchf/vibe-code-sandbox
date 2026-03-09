@@ -39,6 +39,11 @@ services:
       - ENABLE_REMOTE_CONTROL=${ENABLE_REMOTE_CONTROL:-false}
       # Fix: remote-control bridge needs explicit command path for npm-installed claude
       - CLAUDE_CODE_TEAMMATE_COMMAND=claude
+      # OpenClaw API keys (interpolated from host .env)
+      - GOOGLE_AI_API_KEY=${GOOGLE_AI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+      - GATEWAY_AUTH_TOKEN=${GATEWAY_AUTH_TOKEN:-}
 
 volumes:
   vibecraft-data:
