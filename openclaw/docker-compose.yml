@@ -26,7 +26,8 @@ services:
       - sandbox-net
 
     # Entrypoint: fix Docker socket, auto-activate Vibe Guard, sleep
-    command: ["/home/vscode/entrypoint.sh"]
+    # Reconnect .openclaw symlink before running entrypoint
+    command: ["/bin/bash", "-c", "ln -sfn /workspace/.openclaw /home/vscode/.openclaw && exec /home/vscode/entrypoint.sh"]
 
     # Environment variables for the AI context
     environment:
