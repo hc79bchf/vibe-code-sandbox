@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    # image: openclaw-sandbox:snapshot-20260310
+    # image: kalshi-sandbox:latest
     container_name: ${SANDBOX_NAME}-sandbox
 
     # Required for VSCode/Antigravity attach
@@ -26,9 +26,8 @@ services:
     networks:
       - sandbox-net
 
-    # Entrypoint: fix Docker socket, auto-activate Vibe Guard, sleep
-    # Reconnect .openclaw symlink before running entrypoint
-    command: ["/bin/bash", "-c", "ln -sfn /workspace/.openclaw /home/vscode/.openclaw && exec /home/vscode/entrypoint.sh"]
+    # Entrypoint: fix Docker socket, sleep
+    command: ["/bin/bash", "-c", "exec /home/vscode/entrypoint.sh"]
 
     # Environment variables for the AI context
     environment:
@@ -40,11 +39,10 @@ services:
       - ENABLE_REMOTE_CONTROL=${ENABLE_REMOTE_CONTROL:-false}
       # Fix: remote-control bridge needs explicit command path for npm-installed claude
       - CLAUDE_CODE_TEAMMATE_COMMAND=claude
-      # OpenClaw API keys (interpolated from host .env)
-      - GOOGLE_AI_API_KEY=${GOOGLE_AI_API_KEY:-}
+      # Kalshi API keys (interpolated from host .env)
+      - KALSHI_API_KEY=${KALSHI_API_KEY:-}
+      - KALSHI_API_SECRET=${KALSHI_API_SECRET:-}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
-      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
-      - GATEWAY_AUTH_TOKEN=${GATEWAY_AUTH_TOKEN:-}
 
 volumes:
   vibecraft-data:
