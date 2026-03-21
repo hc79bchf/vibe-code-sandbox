@@ -3,7 +3,7 @@ services:
     # build:
     #   context: .
     #   dockerfile: Dockerfile
-    image: openclaw-sandbox:snapshot-20260316-151649
+    image: openclaw-sandbox:snapshot-20260320-100959
     container_name: ${SANDBOX_NAME}-sandbox
 
     # Required for VSCode/Antigravity attach
