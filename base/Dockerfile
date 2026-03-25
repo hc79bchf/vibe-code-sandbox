@@ -44,6 +44,28 @@ RUN install -m 0755 -d /etc/apt/keyrings \
 RUN groupadd -f docker && usermod -aG docker vscode
 
 # ---------------------------------------------------------------------------
+# PostgreSQL client (psql)
+# ---------------------------------------------------------------------------
+RUN apt-get update && apt-get install -y postgresql-client && rm -rf /var/lib/apt/lists/*
+
+# ---------------------------------------------------------------------------
+# Computer-use minimal dependencies (xvfb, xdotool, scrot, imagemagick)
+# ---------------------------------------------------------------------------
+RUN apt-get update && apt-get install -y \
+    xvfb \
+    xdotool \
+    scrot \
+    imagemagick \
+    && rm -rf /var/lib/apt/lists/*
+
+# ---------------------------------------------------------------------------
+# Bun runtime (required by gstack)
+# ---------------------------------------------------------------------------
+RUN curl -fsSL https://bun.sh/install | bash
+ENV BUN_INSTALL="/root/.bun"
+ENV PATH="$BUN_INSTALL/bin:$PATH"
+
+# ---------------------------------------------------------------------------
 # Playwright system dependencies (required for Chromium in dev-browser)
 # ---------------------------------------------------------------------------
 RUN npx playwright install-deps chromium
@@ -112,6 +134,18 @@ RUN code --install-extension anthropic.claude-code 2>/dev/null || true \
 # Claude Code plugins: dev-browser, superpowers, compound-engineering, ralph
 # Registered via Claude Code's marketplace system
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# gstack — virtual engineering team skills by Garry Tan
+# (https://github.com/garrytan/gstack)
+# ---------------------------------------------------------------------------
+RUN git clone https://github.com/garrytan/gstack.git /home/vscode/.claude/skills/gstack \
+    && cd /home/vscode/.claude/skills/gstack && ./setup || true
+
+# ---------------------------------------------------------------------------
+# frontend-design skill from Anthropic skills marketplace
+# ---------------------------------------------------------------------------
+RUN npx skills add anthropics/skills@frontend-design || true
+
 RUN claude plugin marketplace add obra/superpowers-marketplace || true \
     && claude plugin marketplace add sawyerhood/dev-browser || true \
     && claude plugin marketplace add EveryInc/compound-engineering-plugin || true \
