@@ -76,11 +76,6 @@ RUN npx playwright install-deps chromium
 RUN npm install -g @socketsecurity/cli
 
 # ---------------------------------------------------------------------------
-# Claude Code CLI
-# ---------------------------------------------------------------------------
-RUN npm install -g @anthropic-ai/claude-code@latest
-
-# ---------------------------------------------------------------------------
 # Railway CLI (https://railway.com — deploy from sandbox)
 # ---------------------------------------------------------------------------
 RUN curl -fsSL cli.new | bash -s -- -y
@@ -124,36 +119,10 @@ RUN curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/
 RUN pip3 install pre-commit
 
 # ---------------------------------------------------------------------------
-# VS Code Claude Code extension (pre-installed for devcontainer attach)
+# VS Code extensions (pre-installed for devcontainer attach)
 # ---------------------------------------------------------------------------
 USER vscode
-RUN code --install-extension anthropic.claude-code 2>/dev/null || true \
-    && code --install-extension shd101wyy.markdown-preview-enhanced 2>/dev/null || true
-
-# ---------------------------------------------------------------------------
-# Claude Code plugins: dev-browser, superpowers, compound-engineering, ralph
-# Registered via Claude Code's marketplace system
-# ---------------------------------------------------------------------------
-# ---------------------------------------------------------------------------
-# gstack — virtual engineering team skills by Garry Tan
-# (https://github.com/garrytan/gstack)
-# ---------------------------------------------------------------------------
-RUN git clone https://github.com/garrytan/gstack.git /home/vscode/.claude/skills/gstack \
-    && cd /home/vscode/.claude/skills/gstack && ./setup || true
-
-# ---------------------------------------------------------------------------
-# frontend-design skill from Anthropic skills marketplace
-# ---------------------------------------------------------------------------
-RUN npx skills add anthropics/skills@frontend-design || true
-
-RUN claude plugin marketplace add obra/superpowers-marketplace || true \
-    && claude plugin marketplace add sawyerhood/dev-browser || true \
-    && claude plugin marketplace add EveryInc/compound-engineering-plugin || true \
-    && claude plugin marketplace add snarktank/ralph || true \
-    && claude plugin install superpowers@superpowers-marketplace || true \
-    && claude plugin install dev-browser@dev-browser-marketplace || true \
-    && claude plugin install compound-engineering@every-marketplace || true \
-    && claude plugin install ralph-skills@ralph-marketplace || true
+RUN code --install-extension shd101wyy.markdown-preview-enhanced 2>/dev/null || true
 
 # ---------------------------------------------------------------------------
 # Playwright + Chromium browser (for dev-browser plugin)
@@ -164,16 +133,12 @@ RUN npm install -g playwright
 USER vscode
 RUN playwright install chromium
 
-# Pre-create the project settings directory for /workspace
-# (Claude Code derives this path from the workspace mount point)
-RUN mkdir -p /home/vscode/.claude/projects/-workspace
-COPY workspace-claude.md /home/vscode/.claude/projects/-workspace/CLAUDE.md
-
 # ---------------------------------------------------------------------------
-# Claude Code slash commands (available as /implement in Claude Code)
+# Clean all build caches (npm, npx, pip)
 # ---------------------------------------------------------------------------
-RUN mkdir -p /home/vscode/.claude/commands
-COPY commands/ /home/vscode/.claude/commands/
+RUN npm cache clean --force \
+    && rm -rf /home/vscode/.npm/_npx \
+    && pip cache purge 2>/dev/null || true
 
 # ---------------------------------------------------------------------------
 # Helper scripts and config templates
@@ -182,7 +147,6 @@ COPY setup-plugins.sh /home/vscode/setup-plugins.sh
 COPY setup-vibe-guard.sh /home/vscode/setup-vibe-guard.sh
 COPY disable-vibe-guard.sh /home/vscode/disable-vibe-guard.sh
 COPY setup-hooks.sh /home/vscode/setup-hooks.sh
-COPY setup-remote-control.sh /home/vscode/setup-remote-control.sh
 COPY entrypoint.sh /home/vscode/entrypoint.sh
 COPY pre-commit-config.yaml /home/vscode/pre-commit-config.yaml
 COPY vibecraft-hook.sh /home/vscode/vibecraft-hook.sh
@@ -190,9 +154,8 @@ COPY vibecraft-autolink.sh /home/vscode/vibecraft-autolink.sh
 
 USER root
 RUN chmod o+x /home/vscode \
-    && chmod +x /home/vscode/setup-plugins.sh /home/vscode/setup-vibe-guard.sh /home/vscode/disable-vibe-guard.sh /home/vscode/setup-hooks.sh /home/vscode/setup-remote-control.sh /home/vscode/entrypoint.sh /home/vscode/vibecraft-hook.sh /home/vscode/vibecraft-autolink.sh \
-    && chown vscode:vscode /home/vscode/setup-plugins.sh /home/vscode/setup-vibe-guard.sh /home/vscode/disable-vibe-guard.sh /home/vscode/setup-hooks.sh /home/vscode/setup-remote-control.sh /home/vscode/entrypoint.sh /home/vscode/pre-commit-config.yaml /home/vscode/vibecraft-hook.sh /home/vscode/vibecraft-autolink.sh \
-    && chown -R vscode:vscode /home/vscode/.claude
+    && chmod +x /home/vscode/setup-plugins.sh /home/vscode/setup-vibe-guard.sh /home/vscode/disable-vibe-guard.sh /home/vscode/setup-hooks.sh /home/vscode/entrypoint.sh /home/vscode/vibecraft-hook.sh /home/vscode/vibecraft-autolink.sh \
+    && chown vscode:vscode /home/vscode/setup-plugins.sh /home/vscode/setup-vibe-guard.sh /home/vscode/disable-vibe-guard.sh /home/vscode/setup-hooks.sh /home/vscode/entrypoint.sh /home/vscode/pre-commit-config.yaml /home/vscode/vibecraft-hook.sh /home/vscode/vibecraft-autolink.sh
 
 USER vscode
 

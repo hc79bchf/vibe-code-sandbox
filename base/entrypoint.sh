@@ -16,19 +16,6 @@ fi
 # Fix vibecraft data directory ownership (Docker volume creates it as root)
 chown -R vscode:vscode /home/vscode/.vibecraft 2>/dev/null || true
 
-# Patch: fix remote-control bridge spawning for npm-installed Claude Code (requires root)
-# The bridge uses process.execPath (node binary) instead of the claude script,
-# causing "bad option: --sdk-url" errors. Replace with Mc6() which resolves correctly.
-CLI_JS="/usr/lib/node_modules/@anthropic-ai/claude-code/cli.js"
-if [ -f "$CLI_JS" ] && grep -q "execPath:process.execPath,env:process.env,verbose:q" "$CLI_JS"; then
-    sed -i "s/execPath:process.execPath,env:process.env,verbose:q/execPath:Mc6(),env:process.env,verbose:q/" "$CLI_JS"
-    echo "Applied remote-control bridge fix."
-fi
-
-# Configure Claude Code hooks for ntfy.sh push notifications
-# Uses SANDBOX_NAME env var (from docker-compose) as the ntfy topic
-su vscode -c "HOME=/home/vscode /home/vscode/setup-hooks.sh '${SANDBOX_NAME:-sandbox}'"
-
 # --- Switch to vscode for remaining tasks ---
 exec su vscode -c '
     cd /workspace
@@ -55,18 +42,6 @@ exec su vscode -c '
         echo "Workspace is not a git repo. Skipping Vibe Guard auto-setup."
         echo "  To activate later: cd /workspace && ~/setup-vibe-guard.sh"
     fi
-
-    # Auto-enable Remote Control if ENABLE_REMOTE_CONTROL=true
-    if [ "${ENABLE_REMOTE_CONTROL}" = "true" ]; then
-        echo "=== Enabling Remote Control ==="
-        ~/setup-remote-control.sh
-        echo ""
-    fi
-
-    # Ensure Ralph (autonomous agent loop) marketplace is registered
-    claude plugin marketplace add snarktank/ralph 2>/dev/null || true
-    claude plugin install ralph-skills@ralph-marketplace 2>/dev/null || true
-    echo "Ralph agent loop ready. Use /prd to create PRDs, /ralph to run the loop."
 
     sleep infinity
 '
