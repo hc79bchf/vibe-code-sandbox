@@ -20,6 +20,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       # Shared vibecraft events (monitored by vibecraft-sandbox)
       - vibecraft-data:/home/vscode/.vibecraft/data
+      # Mount host Claude credentials so container inherits existing login
+      - ${HOME}/.claude:/home/vscode/.claude:cached
 
     # Claude UI Dashboard port (auto-detected by launch.sh)
     ports:

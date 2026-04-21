@@ -2,9 +2,8 @@
 # =============================================================================
 # Sandbox Entrypoint — runs as root, then drops to vscode
 # 1. Fix Docker socket permissions (requires root)
-# 2. Configure Claude Code hooks for ntfy.sh notifications
-# 3. Auto-activate Vibe Guard if /workspace is a git repo
-# 4. Keep container alive
+# 2. Auto-activate Vibe Guard if /workspace is a git repo
+# 3. Keep container alive
 # =============================================================================
 
 # --- Root tasks ---
@@ -16,9 +15,18 @@ fi
 # Fix vibecraft data directory ownership (Docker volume creates it as root)
 chown -R vscode:vscode /home/vscode/.vibecraft 2>/dev/null || true
 
+# Fix workspace ownership so vscode user can write
+chown -R vscode:vscode /workspace 2>/dev/null || true
+
+# Fix .claude ownership if mounted from host (uid may not match vscode's uid)
+chown vscode:vscode /home/vscode/.claude 2>/dev/null || true
+
 # --- Switch to vscode for remaining tasks ---
 exec su vscode -c '
     cd /workspace
+
+    # Unset DISPLAY so Claude Code defaults to --no-browser OAuth flow
+    unset DISPLAY
 
     # Auto-activate Vibe Guard if workspace is a git repo
     if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then

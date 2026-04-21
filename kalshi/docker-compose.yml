@@ -21,6 +21,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       # Shared vibecraft events (monitored by vibecraft-sandbox)
       - vibecraft-data:/home/vscode/.vibecraft/data
+      # Mount host Claude credentials so container inherits existing login
+      - ${HOME}/.claude:/home/vscode/.claude:cached
 
     # Networking: Allow outbound access (for pip/npm) but you can restrict this later
     networks:

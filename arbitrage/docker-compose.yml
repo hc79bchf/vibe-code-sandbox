@@ -20,6 +20,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       # Shared vibecraft events (monitored by vibecraft-sandbox)
       - vibecraft-data:/home/vscode/.vibecraft/data
+      # Mount host Claude credentials so container inherits existing login
+      - ${HOME}/.claude:/home/vscode/.claude:cached
 
     # Networking: Allow outbound access (for pip/npm) but you can restrict this later
     networks:
@@ -32,6 +34,9 @@ services:
     environment:
       - NODE_ENV=development
       - SANDBOX_NAME=${SANDBOX_NAME}
+      # Force Claude Code to use --no-browser OAuth (no browser in container)
+      - BROWSER=false
+      - DISPLAY=
       # Vibecraft: notify server on host via Docker Desktop bridge
       - VIBECRAFT_WS_NOTIFY=http://host.docker.internal:${VIBECRAFT_PORT:-4003}/event
       # API keys (interpolated from host .env)
