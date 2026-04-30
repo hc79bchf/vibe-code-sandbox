@@ -1,8 +1,9 @@
 services:
   sandbox:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    image: openclaw-sandbox:snapshot-2026-03-13
     container_name: ${SANDBOX_NAME}-sandbox
 
     # Required for VSCode/Antigravity attach
@@ -27,8 +28,8 @@ services:
     networks:
       - sandbox-net
 
-    # Entrypoint: fix Docker socket, auto-activate Vibe Guard, sleep
-    command: ["/home/vscode/entrypoint.sh"]
+    # Entrypoint: fix Docker socket, sleep
+    command: ["/bin/bash", "-c", "exec /home/vscode/entrypoint.sh"]
 
     # Environment variables for the AI context
     environment:
@@ -40,7 +41,9 @@ services:
       - ENABLE_REMOTE_CONTROL=${ENABLE_REMOTE_CONTROL:-false}
       # Fix: remote-control bridge needs explicit command path for npm-installed claude
       - CLAUDE_CODE_TEAMMATE_COMMAND=claude
-      # API keys (interpolated from host .env)
+      # Day-trader broker/API keys (interpolated from host .env)
+      - BROKER_API_KEY=${BROKER_API_KEY:-}
+      - BROKER_API_SECRET=${BROKER_API_SECRET:-}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
 
 volumes:
