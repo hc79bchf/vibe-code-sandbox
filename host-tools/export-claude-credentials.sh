@@ -11,6 +11,11 @@
 # Run periodically via the matching LaunchAgent
 # (~/Library/LaunchAgents/com.hongfeicao.claude-credentials-export.plist)
 # so refreshed tokens propagate before they expire.
+#
+# The agent also re-runs via WatchPaths whenever ~/.claude/.credentials.json
+# changes — host Claude Code's storage wrapper unlinks the file after the
+# first OAuth refresh of a session that finds the keychain empty, so the
+# watch is what actually keeps the file around for the container.
 
 set -euo pipefail
 

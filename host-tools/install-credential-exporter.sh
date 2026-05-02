@@ -7,6 +7,13 @@
 # ~/.claude/.credentials.json, which the docker-compose mount of ~/.claude
 # does carry into containers — eliminating the need to /login inside each one.
 #
+# WatchPaths note: the host Claude Code binary's credential wrapper unlinks
+# ~/.claude/.credentials.json after the first OAuth refresh of a session that
+# finds the keychain empty (it treats the plaintext file as obsolete migration
+# leftover). The WatchPaths entries below cause launchd to re-run the exporter
+# whenever the file or its parent dir is touched, so the deletion gap shrinks
+# from up to StartInterval (30 min) to ~ThrottleInterval (10s, launchd's floor).
+#
 # Idempotent: re-running upgrades the script and reloads the agent.
 
 set -euo pipefail
@@ -42,6 +49,13 @@ cat >"$PLIST" <<PLIST
     <true/>
     <key>StartInterval</key>
     <integer>${INTERVAL_SECONDS}</integer>
+    <key>WatchPaths</key>
+    <array>
+        <string>${HOME}/.claude/.credentials.json</string>
+        <string>${HOME}/.claude</string>
+    </array>
+    <key>ThrottleInterval</key>
+    <integer>10</integer>
     <key>StandardOutPath</key>
     <string>${LOG}</string>
     <key>StandardErrorPath</key>
