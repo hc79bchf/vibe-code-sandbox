@@ -6,35 +6,54 @@ Isolated Docker-based development environments with Claude Code, security scanni
 
 ```
 vibe-code-sandbox/
-  base/                    # Shared base Docker image (vibe-sandbox-base)
-    Dockerfile             # Ubuntu 22.04 + Node 22 + Claude Code + Vibe Guard tools
-    setup-plugins.sh       # Plugin update helper
-    entrypoint.sh          # Container startup (socket fix + Vibe Guard auto-setup)
-    setup-vibe-guard.sh    # Per-project Vibe Guard activation script
-    disable-vibe-guard.sh  # Disable Vibe Guard hooks for a project
-    pre-commit-config.yaml # Default pre-commit hooks template
-  governance-agent/        # Governance Agent sandbox
-  agent-hr/                # Agent HR sandbox
-  claude_ui/               # Claude UI sandbox
+  base/                       # Shared base Docker image (vibe-sandbox-base)
+    Dockerfile                # Ubuntu 22.04 + Node 22 + Claude Code + Vibe Guard tools
+    entrypoint.sh             # Container startup (socket fix + Vibe Guard auto-setup)
+    setup-plugins.sh          # Plugin update helper
+    setup-vibe-guard.sh       # Per-project Vibe Guard activation
+    disable-vibe-guard.sh     # Disable Vibe Guard hooks for a project
+    pre-commit-config.yaml    # Default pre-commit hooks template
+    workspace-claude.md       # Per-workspace CLAUDE.md (OpenSpec + /implement)
+    commands/implement.md     # /implement orchestrator command
+  host-tools/                 # macOS host-side helpers
+    install-credential-exporter.sh  # LaunchAgent that bridges keychain → ~/.claude/.credentials.json
+    export-claude-credentials.sh
+  agent-build-config/         # sandbox
+  agent-hr/                   # sandbox
+  arbitrage/                  # sandbox
+  claude_ui/                  # sandbox
+  day-trader/                 # sandbox
+  governance-agent/           # sandbox
+  kalshi/                     # sandbox
+  openclaw/                   # sandbox
+  vibecraft/                  # sandbox
 ```
 
-Each project sandbox (governance-agent, agent-hr, claude_ui) inherits from `vibe-sandbox-base` and mounts an external project repo as `/workspace`.
+Each sandbox inherits from `vibe-sandbox-base` and mounts an external project repo as `/workspace`. Sandbox container names are derived from `SANDBOX_NAME` in each sandbox's `.env` (e.g. `governance-agent/.env` with `SANDBOX_NAME=governance` → container `governance-sandbox`).
 
 ## Pre-installed Tools
 
-| Tool | Version | Purpose |
-|------|---------|---------|
-| Claude Code CLI | latest | AI coding assistant |
-| VS Code Extension | latest | Claude Code IDE integration |
-| Superpowers plugin | latest | Extended Claude Code capabilities |
-| Dev-Browser plugin | latest | Browser automation for Claude Code |
-| Ruff | 0.15.x | Python linter + formatter |
-| Biome | 2.x | JS/TS linter + formatter |
-| Trivy | 0.69.x | Vulnerability + secret scanner |
-| Gitleaks | 8.21.x | Git secret detection |
-| pre-commit | 4.x | Git hook framework |
-| Socket Security CLI | latest | Dependency security |
-| Docker CLI | latest | Docker-outside-of-Docker |
+Versions reflect what `base/Dockerfile` installs at image-build time (`@latest` resolves to whatever the upstream registry serves on rebuild). Pre-commit hook tools are pinned separately in `base/pre-commit-config.yaml` and may lag behind the system CLI — that is intentional, hooks need reproducible runs.
+
+| Tool | Source / version | Purpose |
+|------|------------------|---------|
+| Claude Code CLI | `@anthropic-ai/claude-code@latest` | AI coding assistant |
+| OpenSpec | `@fission-ai/openspec@latest` | Spec-driven dev workflow (see [base/workspace-claude.md](base/workspace-claude.md)) |
+| Letta Code | `@letta-ai/letta-code` | Context-repo memory for coding agents |
+| Superpowers plugin | latest (via `setup-plugins.sh`) | Extended Claude Code capabilities |
+| Dev-Browser plugin | latest (via `setup-plugins.sh`) | Browser automation for Claude Code |
+| Ruff | latest CLI; hooks pinned `v0.9.6` | Python linter + formatter |
+| Biome | latest CLI; hooks pinned `v0.6.1` (biome `1.9.4`) | JS/TS linter + formatter |
+| Trivy | latest (install.sh) | Vulnerability + secret scanner |
+| Gitleaks | `v8.21.2` | Git secret detection |
+| pre-commit | latest (pip) | Git hook framework |
+| Socket Security CLI | `@socketsecurity/cli` | Dependency security |
+| Docker CLI | apt `docker-ce-cli` | Docker-outside-of-Docker |
+| Bun | latest (bun.sh installer) | Required by gstack |
+| PostgreSQL client | apt `postgresql-client` | `psql` from the sandbox |
+| Railway CLI | latest (`cli.new`) | Deploy from sandbox |
+| Playwright + Chromium | npm `playwright` + browser | Browser automation (dev-browser plugin) |
+| Computer-use deps | xvfb, xdotool, scrot, imagemagick | GUI automation primitives |
 
 ## Quick Start
 
@@ -65,6 +84,16 @@ docker exec -it governance-sandbox /bin/bash
 ```
 
 Vibe Guard activates automatically on container startup if `/workspace` is a git repo. No manual setup needed.
+
+### 4. (macOS host only) Bridge Claude Code credentials
+
+Sandboxes bind-mount `~/.claude/` so the container can reuse the host's logged-in Claude Code session. On macOS the OAuth token lives in the login keychain — unreachable from a Linux container — so a host-side launchd job exports it to `~/.claude/.credentials.json`:
+
+```bash
+bash host-tools/install-credential-exporter.sh
+```
+
+This installs once and runs on every keychain change plus every 30 min. See [host-tools/install-credential-exporter.sh](host-tools/install-credential-exporter.sh) for details. Skip on Linux hosts — `~/.claude/.credentials.json` is already the native storage there.
 
 ## Vibe Guard
 

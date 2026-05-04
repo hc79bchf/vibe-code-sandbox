@@ -49,7 +49,7 @@ All `qa_status` fields default to `false`. All `status` fields start as `"pendin
 
 ## Phase 2: Parallel Coding Subagents
 
-For **each task** in the parsed tasks list, spawn a coding subagent using the `Task` tool with `subagent_type: "general-purpose"`. Run independent tasks in parallel (spawn all at once).
+For **each task** in the parsed tasks list, spawn a coding subagent using the `Agent` tool with `subagent_type: "general-purpose"`. Run independent tasks in parallel (spawn all at once).
 
 Each coding subagent receives this prompt (fill in the placeholders):
 
@@ -111,7 +111,7 @@ After ALL coding subagents complete, read the updated tasks.md and update `featu
 
 ## Phase 3: Quality Assurance Subagent
 
-After all coding subagents finish, spawn a **single QA subagent** using the `Task` tool with `subagent_type: "general-purpose"`:
+After all coding subagents finish, spawn a **single QA subagent** using the `Agent` tool with `subagent_type: "general-purpose"`:
 
 ```
 You are the **Quality Assurance Agent**. Your job is to validate ALL implemented tasks for the feature and record results.
